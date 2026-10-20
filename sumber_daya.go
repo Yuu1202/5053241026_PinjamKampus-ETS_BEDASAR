@@ -1,30 +1,20 @@
 package main
 
-import (
-	"encoding/json"
-	"net/http"
-)
+import "net/http"
 
-// POST /sumber-daya
-// Alur: decode body -> simpan -> 201.
-// Validasi lengkap (trim, maks 50 karakter, jenis, stok >= 1) menyusul di B4.
-// Pengecekan nil di bawah hanya supaya tidak panic.
+// POST /sumber-daya : decode -> validasi -> simpan -> 201.
 func (sv *Server) buatSumberDaya(w http.ResponseWriter, r *http.Request) {
 	var in SumberDayaInput
-	if err := json.NewDecoder(r.Body).Decode(&in); err != nil {
-		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "body bukan JSON yang valid"})
+	if err := decodeBody(r, &in); err != nil {
+		writeError(w, http.StatusBadRequest, "body bukan JSON yang valid")
 		return
 	}
-	if in.Nama == nil || in.Jenis == nil || in.Stok == nil {
-		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "nama, jenis, dan stok wajib diisi"})
+	sd, pesan := validasiSumberDaya(in)
+	if pesan != "" {
+		writeError(w, http.StatusBadRequest, pesan)
 		return
 	}
-	sd := sv.store.tambahSumberDaya(SumberDaya{
-		Nama:  *in.Nama,
-		Jenis: *in.Jenis,
-		Stok:  *in.Stok,
-	})
-	writeJSON(w, http.StatusCreated, sd)
+	writeJSON(w, http.StatusCreated, sv.store.tambahSumberDaya(sd))
 }
 
 // GET /sumber-daya : 200 + array urut id naik, kosong = [].
@@ -36,12 +26,12 @@ func (sv *Server) daftarSumberDaya(w http.ResponseWriter, r *http.Request) {
 func (sv *Server) detailSumberDaya(w http.ResponseWriter, r *http.Request) {
 	id, ok := parseID(r)
 	if !ok {
-		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "id harus berupa angka"})
+		writeError(w, http.StatusBadRequest, "id harus berupa angka")
 		return
 	}
 	sd, ada := sv.store.ambilSumberDaya(id)
 	if !ada {
-		writeJSON(w, http.StatusNotFound, map[string]string{"error": "sumber daya tidak ditemukan"})
+		writeError(w, http.StatusNotFound, "sumber daya tidak ditemukan")
 		return
 	}
 	writeJSON(w, http.StatusOK, sd)
