@@ -10,8 +10,8 @@
 - [x] B3 Lihat peminjaman (daftar, filter, detail)
 - [x] B4 Validasi dan error JSON
 - [x] B5 Deteksi bentrok (409)
-- [ ] B6 Ubah dan hapus
-- [ ] B7 Aman untuk permintaan bersamaan
+- [x] B6 Ubah dan hapus
+- [x] B7 Aman untuk permintaan bersamaan
 - [ ] Fitur khas persona
 - [ ] Change request
 

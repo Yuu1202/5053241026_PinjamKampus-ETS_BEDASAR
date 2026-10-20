@@ -33,6 +33,14 @@ Slot diperiksa satu per satu dari mulai sampai selesai, jadi kasus tumpang tindi
 3-5 lawan 4-4 ikut terdeteksi, tidak hanya yang `slot_mulai`-nya sama. Aturan "status mana yang menahan slot"
 saya taruh di satu fungsi (`menahanSlot`) supaya mudah diubah nanti.
 
+Cek bentrok dan penyimpanan saya lakukan dalam satu `Lock()` di dalam method store
+(`buatPeminjaman` dan `ubahPeminjaman`). Sebelumnya handler mengecek bentrok lalu menyimpan
+sebagai dua langkah terpisah, sehingga dua request bisa sama-sama lolos cek dan sama-sama menyimpan
+(dua 201 untuk satu slot). Fungsi `terpakai` dan `bentrok` tidak mengunci sendiri karena dipanggil
+saat kunci sudah dipegang. `sync.Mutex` tidak reentrant, jadi mengunci dua kali di goroutine yang sama
+akan deadlock. Method daftar mengembalikan salinan slice supaya pemanggil tidak memegang data internal
+di luar kunci.
+
 ## 4. Bug atau kendala (minimal dua)
 ### Kendala 1
 - Gejala: Setup Go memakan banyak waktu dikarenakan baru pertamakali membuat project GO from scratch
