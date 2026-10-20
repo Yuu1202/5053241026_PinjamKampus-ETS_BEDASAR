@@ -6,8 +6,7 @@ import (
 	"strings"
 )
 
-// POST /peminjaman : decode -> validasi (400) -> simpan -> 201.
-// Cek bentrok (409) menyusul di B5.
+// POST /peminjaman : decode -> validasi (400) -> cek bentrok (409) -> simpan -> 201.
 func (sv *Server) buatPeminjaman(w http.ResponseWriter, r *http.Request) {
 	var in PeminjamanInput
 	if err := decodeBody(r, &in); err != nil {
@@ -17,6 +16,11 @@ func (sv *Server) buatPeminjaman(w http.ResponseWriter, r *http.Request) {
 	p, pesan := validasiPeminjaman(in, sv.store.ambilSumberDaya)
 	if pesan != "" {
 		writeError(w, http.StatusBadRequest, pesan)
+		return
+	}
+	sd, _ := sv.store.ambilSumberDaya(p.SumberDayaID) // pasti ada, sudah divalidasi
+	if sv.store.bentrok(p, sd.Stok) {
+		writeError(w, http.StatusConflict, "slot bentrok: kapasitas sumber daya tidak cukup")
 		return
 	}
 	writeJSON(w, http.StatusCreated, sv.store.tambahPeminjaman(p))
