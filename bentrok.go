@@ -6,6 +6,9 @@ func menahanSlot(p Peminjaman) bool {
 	return p.Status == StatusAktif
 }
 
+// PENTING (B7): terpakai dan bentrok hanya boleh dipanggil saat s.mu SUDAH dipegang
+// (dari buatPeminjaman / ubahPeminjaman). Jangan mengunci lagi di sini, nanti deadlock.
+
 // terpakai menjumlahkan "jumlah" (bukan banyaknya peminjaman) pada satu
 // kombinasi (sumber daya, tanggal, slot).
 // abaikanID > 0 -> peminjaman dengan id itu dilewati (dipakai PUT).
