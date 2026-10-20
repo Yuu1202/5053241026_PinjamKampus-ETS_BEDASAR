@@ -1,7 +1,7 @@
 # PROSES
 
 ## 1. Persona dan masalahnya
-(2-3 kalimat dengan kata-katamu sendiri: siapa pengguna persona kamu, masalah apa yang diselesaikan fitur khasnya.)
+belum mengerjakan persona
 
 ## 2. Rancangan struktur data
 Semua data disimpan di memori dalam satu struct `Store`:
@@ -44,13 +44,13 @@ di luar kunci.
 ## 4. Bug atau kendala (minimal dua)
 ### Kendala 1
 - Gejala: Setup Go memakan banyak waktu dikarenakan baru pertamakali membuat project GO from scratch
-- Cara menemukan:
-- Penyebab dan solusi:
+- Cara menemukan: waktu
+- Penyebab dan solusi: waktu
 
 ### Bug 2
-- Gejala:
-- Cara menemukan:
-- Penyebab dan solusi:
+- Gejala:postman lag
+- Cara menemukan: lag
+- Penyebab dan solusi: menggunakan Curl
 
 ## 5. Change request
-(Apa yang diminta, bagian kode mana yang kamu ubah, dan satu keputusan desain yang kamu ambil.)
+belum dikerjakan
