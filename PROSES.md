@@ -21,9 +21,15 @@ Semua data disimpan di memori dalam satu struct `Store`:
 bukan di variabel global. Alasannya, data tidak boleh bocor antar pemanggilan: tiap
 `NewHandler()` harus mulai dari kosong dengan id kembali ke 1.
 
+Validasi saya pecah jadi fungsi kecil (`validasiTeks`, `validasiTanggal`, `validasiSlot`, `validasiPeminjaman`)
+supaya aturan yang sama bisa dipakai ulang oleh POST dan PUT. Panjang teks dihitung dengan
+`utf8.RuneCountInString`, bukan `len`, karena `len` menghitung byte sehingga huruf non-ASCII
+bisa salah dihitung. Tanggal diperiksa dengan `time.Parse` ditambah cek panjang 10 karakter,
+supaya format seperti `2026-1-5` ikut ditolak.
+
 ## 4. Bug atau kendala (minimal dua)
-### Bug 1
-- Gejala:
+### Kendala 1
+- Gejala: Setup Go memakan banyak waktu dikarenakan baru pertamakali membuat project GO from scratch
 - Cara menemukan:
 - Penyebab dan solusi:
 
