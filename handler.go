@@ -17,6 +17,8 @@ func NewHandler() http.Handler {
 	mux.HandleFunc("GET /sumber-daya", srv.daftarSumberDaya)
 	mux.HandleFunc("GET /sumber-daya/{id}", srv.detailSumberDaya)
 	mux.HandleFunc("POST /peminjaman", srv.buatPeminjaman)
+	mux.HandleFunc("GET /peminjaman", srv.daftarPeminjaman)
+	mux.HandleFunc("GET /peminjaman/{id}", srv.detailPeminjaman)
 
 	return mux
 }

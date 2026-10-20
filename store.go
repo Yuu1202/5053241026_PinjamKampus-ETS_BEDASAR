@@ -45,3 +45,29 @@ func (s *Store) tambahPeminjaman(p Peminjaman) Peminjaman {
 	s.peminjaman = append(s.peminjaman, p)
 	return p
 }
+
+func (s *Store) ambilPeminjaman(id int) (Peminjaman, bool) {
+	for _, p := range s.peminjaman {
+		if p.ID == id {
+			return p, true
+		}
+	}
+	return Peminjaman{}, false
+}
+
+func (s *Store) daftarPeminjaman(f FilterPeminjaman) []Peminjaman {
+	out := []Peminjaman{}
+	for _, p := range s.peminjaman {
+		if f.SumberDayaID != nil && p.SumberDayaID != *f.SumberDayaID {
+			continue
+		}
+		if f.Tanggal != nil && p.Tanggal != *f.Tanggal {
+			continue
+		}
+		if f.Status != nil && p.Status != *f.Status {
+			continue
+		}
+		out = append(out, p)
+	}
+	return out
+}

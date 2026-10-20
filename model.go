@@ -48,3 +48,12 @@ type PeminjamanInput struct {
 	SlotSelesai  *int    `json:"slot_selesai"`
 	Jumlah       *int    `json:"jumlah"`
 }
+
+// ===== CP1 | B3 =====
+
+// FilterPeminjaman: nil berarti filter tidak dipakai.
+type FilterPeminjaman struct {
+	SumberDayaID *int
+	Tanggal      *string
+	Status       *string
+}
