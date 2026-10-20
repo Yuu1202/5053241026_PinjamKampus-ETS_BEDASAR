@@ -57,3 +57,14 @@ type FilterPeminjaman struct {
 	Tanggal      *string
 	Status       *string
 }
+
+//===== CP2 =====
+//===== CP2 | B4 =====
+
+// ===== B4 =====
+
+const (
+	JenisRuang     = "ruang"
+	JenisAlat      = "alat"
+	MaxPanjangTeks = 50 // nama dan peminjam, dihitung per karakter (rune)
+)

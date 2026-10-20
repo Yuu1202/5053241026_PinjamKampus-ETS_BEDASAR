@@ -1,5 +1,7 @@
 package main
 
+// tidak memakai AI
+
 import (
 	"log"
 	"net/http"

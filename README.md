@@ -1,7 +1,7 @@
 # PinjamKampus API
 
 - Nama dan NRP: Muhammad Yusuf Qardhawi - 5053241026
-- Persona:
+- Persona: B
 - Cara menjalankan: `go run .` lalu buka http://localhost:8080
 
 ## Fitur
