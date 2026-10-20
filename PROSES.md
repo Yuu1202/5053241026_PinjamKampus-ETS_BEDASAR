@@ -27,6 +27,12 @@ supaya aturan yang sama bisa dipakai ulang oleh POST dan PUT. Panjang teks dihit
 bisa salah dihitung. Tanggal diperiksa dengan `time.Parse` ditambah cek panjang 10 karakter,
 supaya format seperti `2026-1-5` ikut ditolak.
 
+Bentrok dihitung dengan menjumlahkan `jumlah` pada tiap slot, bukan sekadar mengecek ada atau tidaknya
+peminjaman lain. Dengan begitu satu aturan yang sama melayani ruang (stok 1) dan alat (stok lebih dari 1).
+Slot diperiksa satu per satu dari mulai sampai selesai, jadi kasus tumpang tindih sebagian seperti
+3-5 lawan 4-4 ikut terdeteksi, tidak hanya yang `slot_mulai`-nya sama. Aturan "status mana yang menahan slot"
+saya taruh di satu fungsi (`menahanSlot`) supaya mudah diubah nanti.
+
 ## 4. Bug atau kendala (minimal dua)
 ### Kendala 1
 - Gejala: Setup Go memakan banyak waktu dikarenakan baru pertamakali membuat project GO from scratch
