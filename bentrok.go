@@ -8,10 +8,12 @@ func menahanSlot(p Peminjaman) bool {
 
 // terpakai menjumlahkan "jumlah" (bukan banyaknya peminjaman) pada satu
 // kombinasi (sumber daya, tanggal, slot).
-func (s *Store) terpakai(sdID int, tanggal string, slot int) int {
+// abaikanID > 0 -> peminjaman dengan id itu dilewati (dipakai PUT).
+// POST memakai abaikanID 0 karena id mulai dari 1 (tidak ada yang dilewati).
+func (s *Store) terpakai(sdID int, tanggal string, slot, abaikanID int) int {
 	total := 0
 	for _, p := range s.peminjaman {
-		if p.SumberDayaID != sdID || p.Tanggal != tanggal || !menahanSlot(p) {
+		if p.ID == abaikanID || p.SumberDayaID != sdID || p.Tanggal != tanggal || !menahanSlot(p) {
 			continue
 		}
 		if slot >= p.SlotMulai && slot <= p.SlotSelesai {
@@ -23,9 +25,9 @@ func (s *Store) terpakai(sdID int, tanggal string, slot int) int {
 
 // bentrok memeriksa SETIAP slot dari mulai sampai selesai.
 // Bentrok bila pada salah satu slot: terpakai + jumlah baru > stok.
-func (s *Store) bentrok(p Peminjaman, stok int) bool {
+func (s *Store) bentrok(p Peminjaman, stok, abaikanID int) bool {
 	for slot := p.SlotMulai; slot <= p.SlotSelesai; slot++ {
-		if s.terpakai(p.SumberDayaID, p.Tanggal, slot)+p.Jumlah > stok {
+		if s.terpakai(p.SumberDayaID, p.Tanggal, slot, abaikanID)+p.Jumlah > stok {
 			return true
 		}
 	}

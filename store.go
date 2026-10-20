@@ -71,3 +71,31 @@ func (s *Store) daftarPeminjaman(f FilterPeminjaman) []Peminjaman {
 	}
 	return out
 }
+
+// ===== B6 =====
+
+// gantiPeminjaman mengganti keenam field; id dan status TIDAK berubah.
+// Dipanggil hanya setelah validasi dan cek bentrok lolos, jadi bila 409
+// data lama tetap utuh.
+func (s *Store) gantiPeminjaman(id int, p Peminjaman) (Peminjaman, bool) {
+	for i := range s.peminjaman {
+		if s.peminjaman[i].ID == id {
+			p.ID = id
+			p.Status = s.peminjaman[i].Status
+			s.peminjaman[i] = p
+			return p, true
+		}
+	}
+	return Peminjaman{}, false
+}
+
+// hapusPeminjaman membuang data; urutan sisanya tetap id naik.
+func (s *Store) hapusPeminjaman(id int) bool {
+	for i := range s.peminjaman {
+		if s.peminjaman[i].ID == id {
+			s.peminjaman = append(s.peminjaman[:i], s.peminjaman[i+1:]...)
+			return true
+		}
+	}
+	return false
+}

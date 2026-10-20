@@ -19,7 +19,7 @@ func (sv *Server) buatPeminjaman(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	sd, _ := sv.store.ambilSumberDaya(p.SumberDayaID) // pasti ada, sudah divalidasi
-	if sv.store.bentrok(p, sd.Stok) {
+	if sv.store.bentrok(p, sd.Stok, 0) {
 		writeError(w, http.StatusConflict, "slot bentrok: kapasitas sumber daya tidak cukup")
 		return
 	}
@@ -63,4 +63,51 @@ func (sv *Server) detailPeminjaman(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	writeJSON(w, http.StatusOK, p)
+}
+
+// ===== B6 =====
+
+// PUT /peminjaman/{id}
+// Urutan: id bukan angka 400 -> tidak ada 404 -> body/validasi 400 -> bentrok 409 -> 200.
+func (sv *Server) ubahPeminjaman(w http.ResponseWriter, r *http.Request) {
+	id, ok := parseID(r)
+	if !ok {
+		writeError(w, http.StatusBadRequest, "id harus berupa angka")
+		return
+	}
+	if _, ada := sv.store.ambilPeminjaman(id); !ada {
+		writeError(w, http.StatusNotFound, "peminjaman tidak ditemukan")
+		return
+	}
+	var in PeminjamanInput
+	if err := decodeBody(r, &in); err != nil {
+		writeError(w, http.StatusBadRequest, "body bukan JSON yang valid")
+		return
+	}
+	p, pesan := validasiPeminjaman(in, sv.store.ambilSumberDaya)
+	if pesan != "" {
+		writeError(w, http.StatusBadRequest, pesan)
+		return
+	}
+	sd, _ := sv.store.ambilSumberDaya(p.SumberDayaID)
+	if sv.store.bentrok(p, sd.Stok, id) { // abaikan dirinya sendiri
+		writeError(w, http.StatusConflict, "slot bentrok: kapasitas sumber daya tidak cukup")
+		return
+	}
+	hasil, _ := sv.store.gantiPeminjaman(id, p)
+	writeJSON(w, http.StatusOK, hasil)
+}
+
+// DELETE /peminjaman/{id} : bukan angka 400, tidak ada 404, sukses 204 TANPA body.
+func (sv *Server) hapusPeminjaman(w http.ResponseWriter, r *http.Request) {
+	id, ok := parseID(r)
+	if !ok {
+		writeError(w, http.StatusBadRequest, "id harus berupa angka")
+		return
+	}
+	if !sv.store.hapusPeminjaman(id) {
+		writeError(w, http.StatusNotFound, "peminjaman tidak ditemukan")
+		return
+	}
+	w.WriteHeader(http.StatusNoContent)
 }
