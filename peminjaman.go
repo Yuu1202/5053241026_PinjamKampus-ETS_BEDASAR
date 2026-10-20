@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-// POST /peminjaman : decode -> validasi (400) -> cek bentrok (409) -> simpan -> 201.
+// POST /peminjaman : decode -> validasi (400) -> cek bentrok + simpan satu kunci (409/201).
 func (sv *Server) buatPeminjaman(w http.ResponseWriter, r *http.Request) {
 	var in PeminjamanInput
 	if err := decodeBody(r, &in); err != nil {
@@ -19,11 +19,12 @@ func (sv *Server) buatPeminjaman(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	sd, _ := sv.store.ambilSumberDaya(p.SumberDayaID) // pasti ada, sudah divalidasi
-	if sv.store.bentrok(p, sd.Stok, 0) {
+	hasil, ok := sv.store.buatPeminjaman(p, sd.Stok)  // cek bentrok + simpan, satu kunci
+	if !ok {
 		writeError(w, http.StatusConflict, "slot bentrok: kapasitas sumber daya tidak cukup")
 		return
 	}
-	writeJSON(w, http.StatusCreated, sv.store.tambahPeminjaman(p))
+	writeJSON(w, http.StatusCreated, hasil)
 }
 
 // GET /peminjaman?sumber_daya_id=&tanggal=&status=
@@ -90,12 +91,15 @@ func (sv *Server) ubahPeminjaman(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	sd, _ := sv.store.ambilSumberDaya(p.SumberDayaID)
-	if sv.store.bentrok(p, sd.Stok, id) { // abaikan dirinya sendiri
-		writeError(w, http.StatusConflict, "slot bentrok: kapasitas sumber daya tidak cukup")
-		return
+	hasil, kode := sv.store.ubahPeminjaman(id, p, sd.Stok) // cek bentrok + ganti, satu kunci
+	switch kode {
+	case http.StatusNotFound:
+		writeError(w, kode, "peminjaman tidak ditemukan")
+	case http.StatusConflict:
+		writeError(w, kode, "slot bentrok: kapasitas sumber daya tidak cukup")
+	default:
+		writeJSON(w, http.StatusOK, hasil)
 	}
-	hasil, _ := sv.store.gantiPeminjaman(id, p)
-	writeJSON(w, http.StatusOK, hasil)
 }
 
 // DELETE /peminjaman/{id} : bukan angka 400, tidak ada 404, sukses 204 TANPA body.
